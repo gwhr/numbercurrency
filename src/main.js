@@ -15,6 +15,10 @@ import './assets/css/reset.css'
 
 import i18n from './i18n'
 Vue.use(Vant);
+global.url = 'http://wakuang.test.nbtest.net/'
+import globalApi from '@/utils/globalApi.js'
+// 全局API
+Vue.prototype.globalApi = globalApi;
 // 全局组件注册
 const requireComponents = require.context(
   './components/assembly',
@@ -32,8 +36,10 @@ requireComponents.keys().forEach(fileName=>{
   Vue.component(reqComName, reqCom.default || reqCom)
 
 })
-new Vue({
+const sVue = new Vue({
   router,
   i18n,
   render: h => h(App)
 }).$mount('#app')
+
+export const _that =  sVue;

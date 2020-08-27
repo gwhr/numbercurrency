@@ -16,5 +16,13 @@ module.exports = {
         prependData: `@import "@/assets/css/global.scss";`
       }
     }
-  }
+  },
+  devServer: {
+    overlay: {
+        warnings: false,
+        errors: false
+    },
+  
+},
+lintOnSave: false
 }

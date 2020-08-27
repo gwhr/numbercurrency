@@ -2,7 +2,7 @@
   <div class="bottomBtn">
     <router-view></router-view>
     <ul class="btnList">
-      <li v-for="(item,index) in bottomList" :key="index" @click="toLink(item,index)">
+      <li v-for="(item,index) in bottomList" :key="item.path" @click="toLink(item,index)">
         <img v-if="active != index" :src="item.img" alt />
         <img v-if="active == index" :src="item.imgs" alt />
         <span>{{item.name}}</span>
@@ -76,6 +76,22 @@ export default {
       this.$router.push({
         path:item.path
       })
+    }
+  },
+  watch:{
+    $route(to,from){
+      console.log(to.path)
+     if(to.path == '/home'){
+        this.active = 0
+     }else if(to.path == '/plugin'){
+       this.active = 1
+     }else if(to.path == '/transactions'){
+       this.active = 2
+     }else if(to.path == '/quotation'){
+       this.active = 3
+     }else if(to.path == '/account'){
+       this.active = 4
+     }
     }
   },
   created() {},

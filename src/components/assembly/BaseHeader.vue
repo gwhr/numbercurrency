@@ -3,7 +3,8 @@
   <div class="header">
       <span>{{name}}</span>
       <span class="back" @click="toback" v-show='backShow'>
-        <i class="iconfont iconfanhui"></i>
+        <!-- <i class="iconfont iconfanhui"></i> -->
+        <img src="../../assets/image/back.svg" alt="">
       </span>
       <div class="operation">
         <slot name="operation" ></slot>
@@ -64,9 +65,13 @@ export default {
           left:0;
           top:0;
           padding-left:10px;
+          img{
+            width:20px;
+            height:20px;
+          }
         }
         .operation{
-          color:#fff;
+          color:#999;
           position: absolute;
           right:0;
           top:0;

@@ -2,3 +2,18 @@
     width:90%;
     margin:0 auto;
 }
+@mixin green{
+    color: #0d9652;
+}
+.van-cell{
+    background:transparent;
+    color:#fff ;
+    border:none;
+    /deep/.van-field__control{
+        color:#fff ;
+    }
+}
+
+.van-cell::after{
+    border:none
+}

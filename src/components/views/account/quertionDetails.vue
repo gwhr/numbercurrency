@@ -3,10 +3,15 @@
       <BaseHeader :name="name"></BaseHeader>
       <!-- 内容 -->
       <div class="contents">
-          <div class='content_title'>{{title}}</div>
-          <div class='content_details' v-html="content"></div>
+          
+          <div class='content_details'>
+            {{info.title}}
+          </div>
+         <div class='content_details'>
+            {{info.content}}
+          </div>
           <p class="content_time">
-            {{time}}
+            {{info.add_time}}
           </p>
       </div>
   </div>
@@ -16,10 +21,8 @@
 export default {
   data() {
     return {
-        name:this.$t('details'),
-        content:'',
-        title:'',
-        time:''
+        name:'反饋詳情',
+        info:{}
     };
   },
   methods: {
@@ -29,10 +32,7 @@ export default {
 
   },
   mounted() {
-    console.log( this.$route.query.item)
-      this.title = this.$route.query.item.post_title;
-      this.content = this.$route.query.item.post_content;
-      this.time = this.$route.query.item.post_date;
+      this.info = this.$route.query.info;
   },
   components: {},
 }
@@ -61,12 +61,6 @@ export default {
       color:#fff;
       line-height:1.5;
       font-size:14px;
-    }
-    .content_title{
-      color:#fff;
-      line-height:1.5;
-      font-size:14px;
-      text-align:center;
     }
 }
 </style>

@@ -13,36 +13,27 @@
             {{$t('Up and down')}}
         </li>
     </ul>
-    <ul class="quotation_details" v-for="(item,index) in 5" :key="index">
+    <ul class="quotation_details" v-for="(item,index) in list" :key="index" >
         <li class='quotation_header_name'>
-            <p style="color:#fff;font-size:16px;">BTC/USDT</p>
-            <p style="font-size:12px;">24h量 41386</p>
+            <p style="color:#fff;font-size:16px;">{{item.base}}/{{item.target}}</p>
+            <p style="font-size:12px;">24h量 {{(item.volume).toFixed(0)}}</p>
         </li>
         <li class='quotation_header_price'>
-            <p style="color:#fff;font-size:16px;">9814.01</p>
-            <p style="font-size:12px;">NT$290393.0955</p>
+            <p style="color:#fff;font-size:16px;">{{item.last}}</p>
+            <!-- <p style="font-size:12px;">NT${{(item.last*2.94).toFixed(0)}}</p> -->
         </li>
-        <li class='quotation_header_upDown'>
-            <p class="quotation_header_upDown_btn">+0.56%</p>
+        <li class='quotation_header_upDown' v-if="item.trust_score == 'green'">
+            <p class="quotation_header_upDown_btn">+{{(item.bid_ask_spread_percentage).toFixed(2)}}%</p>
         </li>
-    </ul>
-    <ul class="quotation_details" v-for="(item,index) in 5" :key="index">
-        <li class='quotation_header_name'>
-            <p style="color:#fff;font-size:16px;">BTC/USDT</p>
-            <p style="font-size:12px;">24h量 41386</p>
-        </li>
-        <li class='quotation_header_price'>
-            <p style="color:#fff;font-size:16px;">9814.01</p>
-            <p style="font-size:12px;">NT$290393.0955</p>
-        </li>
-        <li class='quotation_header_upDown'>
-            <p class="quotation_header_upDown_btn quotation_header_upDown_btn2">+0.56%</p>
+        <li class='quotation_header_upDown' v-if="item.trust_score != 'green'">
+            <p class="quotation_header_upDown_btn quotation_header_upDown_btn2">-{{(item.bid_ask_spread_percentage).toFixed(2)}}%</p>
         </li>
     </ul>
   </div>
 </template>
 
 <script>
+let time;
 export default {
   data() {
     return {
@@ -50,9 +41,40 @@ export default {
       list:[]
     };
   },
-  methods: {},
+  methods: {
+    // 行情
+    articles(){
+        let params = {
+          per_page:100,
+          page:1,
+          vs_currency:'usd'
+        }
+        let baseArr = []
+        this.globalApi.api.coin.price(params).then(value=>{
+              console.log(value)
+              this.list = []
+              value.data.tickers.forEach(v=>{
+                if((v.base == 'BTC' || v.base == 'PAX' || v.base == 'EOS') && (v.target == "USDT") ){
+                    if(baseArr.indexOf(v.base) == -1){
+                      this.list.push(v);
+                      baseArr.push(v.base)
+                    }
+                    
+                }
+              })
+          })
+      }
+  },
   created() {},
-  mounted() {},
+  mounted() {
+    this.articles()
+   time= setInterval(()=>{
+    this.articles()
+    },5000)
+  },
+  destroyed(){
+    clearInterval(time)
+  },
   components: {}
 };
 </script>

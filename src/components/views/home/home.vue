@@ -1,36 +1,50 @@
 <template>
   <div style="height:100%;overflow:auto;padding-bottom:50px">
     <!-- 轮播图 -->
-    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" :show-indicators="false">
-      <van-swipe-item>
-        <img :src="img1" alt />
-      </van-swipe-item>
-      <van-swipe-item>
-        <img :src="img1" alt />
+    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" :show-indicators="false" >
+      <van-swipe-item v-for="(item,index) in topList" :key="index" >
+        <img :src="`${item.thumb}`" alt />
       </van-swipe-item>
     </van-swipe>
     <!-- 内容 -->
     <div class="layout">
       <!-- 通知栏 -->
       <div class="inform_card">
-        <div class="inform_swiper"></div>
+        <div class="inform_swiper">
+          <div class="gonggao_title">
+              <img src="../../../assets/image/gonggao_3.png" alt="">
+              <span>[{{$t('System notification')}}]</span>
+          </div>
+          <van-swipe
+            vertical
+            class="notice-swipe"
+            :autoplay="3000"
+            :show-indicators="false"
+          >
+            
+            <van-swipe-item v-for="(item,index) in topList" :key="index" >{{item.post_excerpt}}</van-swipe-item>
+          </van-swipe>
+        </div>
         <ul class="inform_card_data">
-          <li class="inform_card_list" v-for="(item,index) in 3" :key="index">
+          <li class="inform_card_list" v-for="(item,index) in list" :key="index">
             <p class="inform_card_list_name">
-              <span>BTC/USDT</span>
+              <span>{{item.base}}/{{item.target}}</span>
             </p>
             <p class="inform_card_list_number">
-              <span>BTC/USDT</span>
+              <span>{{item.last}}</span>
             </p>
-            <p class="inform_card_list_precent">
-              <span>+0.08%</span>
+            <p class="inform_card_list_precent" v-if="item.trust_score == 'green'">
+              <span>+{{(item.bid_ask_spread_percentage-0).toFixed(2)}}%</span>
+            </p>
+            <p class="inform_card_list_precent2" v-if="item.trust_score != 'green'">
+              <span>-{{(item.bid_ask_spread_percentage-0).toFixed(2)}}%</span>
             </p>
           </li>
         </ul>
       </div>
       <!-- tab列 -->
       <ul class="tab_index">
-        <li class="tab_index_list" v-for="(item,index) in tabList" :key="index">
+        <li class="tab_index_list" v-for="(item,index) in tabList" :key="index" @click="toLink(item.path)">
           <div class="tab_index_list_img">
             <p>
               <img :src="item.img" alt />
@@ -55,36 +69,12 @@
           </div>
           <!-- 列表 -->
           <ul >
-            <li class="home_news_list">
+            <li class="home_news_list" @click="toDetails(item)" v-for="(item,index) in articlelist" :key="index">
                 <p class="home_news_list_details">
-                  【数字钱包与比特币托管机构Xapo不再支持通过信用卡向账户输入资金】数字钱包与比特币托管机构Xapo在6月11日表示，从11日起用户将不再能通过信用卡向账户输入资金。除此之外，银行转账需要满足最小交易额与用户所在地点的限制。(Coindesk)
+                  {{item.post_excerpt}}
                 </p>
                 <p class="home_news_list_time">
-                  2020-06-12 17:57:08
-                </p>
-            </li>
-            <li class="home_news_list">
-                <p class="home_news_list_details">
-                  【数字钱包与比特币托管机构Xapo不再支持通过信用卡向账户输入资金】数字钱包与比特币托管机构Xapo在6月11日表示，从11日起用户将不再能通过信用卡向账户输入资金。除此之外，银行转账需要满足最小交易额与用户所在地点的限制。(Coindesk)
-                </p>
-                <p class="home_news_list_time">
-                  2020-06-12 17:57:08
-                </p>
-            </li>
-            <li class="home_news_list">
-                <p class="home_news_list_details">
-                  【数字钱包与比特币托管机构Xapo不再支持通过信用卡向账户输入资金】数字钱包与比特币托管机构Xapo在6月11日表示，从11日起用户将不再能通过信用卡向账户输入资金。除此之外，银行转账需要满足最小交易额与用户所在地点的限制。(Coindesk)
-                </p>
-                <p class="home_news_list_time">
-                  2020-06-12 17:57:08
-                </p>
-            </li>
-            <li class="home_news_list">
-                <p class="home_news_list_details">
-                  【数字钱包与比特币托管机构Xapo不再支持通过信用卡向账户输入资金】数字钱包与比特币托管机构Xapo在6月11日表示，从11日起用户将不再能通过信用卡向账户输入资金。除此之外，银行转账需要满足最小交易额与用户所在地点的限制。(Coindesk)
-                </p>
-                <p class="home_news_list_time">
-                  2020-06-12 17:57:08
+                  {{item.post_date}}
                 </p>
             </li>
           </ul>
@@ -94,6 +84,7 @@
 </template>
 
 <script>
+let time;
 import img1 from "../../../assets/logo.png";
 import xinshou from "@/assets/image/xinshou.png";
 import rujin from "@/assets/image/rujin.png";
@@ -104,35 +95,115 @@ import zixun_1 from "@/assets/image/zixun_1.png";
 export default {
   data() {
     return {
+      url:global.url,
       img1,
+      articlelist:[],
       zixun_1,
+      allData:[],
+      list:[],
+      topList:[],
+      list:[],
       tabList: [
         {
           name: this.$t("notice"),
-          img: xinshou
+          img: xinshou,
+          path:"/news"
         },
         {
           name: this.$t("Gold deposit"),
-          img: rujin
+          img: rujin,
+          path:"/deposit"
         },
         {
           name: this.$t("exchange"),
-          img: duihuans
+          img: duihuans,
+          path:"/exchange"
         },
         {
           name: this.$t("profit"),
-          img: shouyi
+          img: shouyi,
+          path:"/profitRecord"
         },
-        {
-          name: this.$t("USDT Recharge"),
-          img: usdticon
-        }
+        // {
+        //   name: this.$t("USDT Recharge"),
+        //   img: usdticon,
+        //   path:"/exchange2"
+        // }
       ]
     };
   },
-  methods: {},
+  methods: {
+    toDetails(item){
+      this.$router.push({
+        path:"/acticleDetails",
+        query:{
+          item
+        }
+      })
+    },
+    toLink(path){
+      this.$router.push({
+        path
+      })
+    },
+    // 行情
+    price(){
+        let params = {
+          per_page:100,
+          page:1,
+          vs_currency:'usd'
+        }
+        let baseArr = []
+        this.globalApi.api.coin.price(params).then(value=>{
+              console.log(value)
+              this.list = []
+              value.data.tickers.forEach(v=>{
+                if((v.base == 'BTC' || v.base == 'PAX' || v.base == 'EOS') && (v.target == "USDT") ){
+                    if(baseArr.indexOf(v.base) == -1){
+                      this.list.push(v);
+                      baseArr.push(v.base)
+                    }
+                    
+                }
+              })
+          })
+      },
+    // 獲取文章列表
+      articles(){
+        this.globalApi.api.index.articles().then(value=>{
+              if(value.data.code == 200){
+                this.allData = value.data.data;
+                for(let i in this.allData){
+                  let obj = {
+                    name:this.allData[i].name,
+                    objname:i
+                  }
+                  if(this.allData[i].name == '快訊'){
+                      this.articlelist = this.allData[i].articles
+                  }
+                }
+                this.articlelist.forEach(v=>{
+                  if(v.istop == 1){
+                    this.topList.push(v)
+                  }
+                })
+              }else{
+              }
+          })
+      }
+    
+  },
   created() {},
-  mounted() {},
+  mounted() {
+    this.articles(); 
+    this.price();
+      time= setInterval(()=>{
+      this.price()
+    },5000)
+  },
+  destroyed(){
+    clearInterval(time)
+  },
   components: {}
 };
 </script>
@@ -145,6 +216,13 @@ export default {
     height: 100%;
   }
 }
+.notice-swipe {
+    height: 50px;
+    line-height: 50px;
+    .van-swipe-item{
+      overflow: hidden;
+    }
+  }
 .inform_card {
   height: 150px;
   background: #1f1f23;
@@ -152,9 +230,27 @@ export default {
   @include layout;
   position: relative;
   top: -5px;
+  margin-top:-90px;
   .inform_swiper {
     height: 50px;
-    margin: -90px auto 0;
+    // margin: -90px auto 0;
+    display:flex;
+    line-height:50px;
+    .gonggao_title{
+      width:130px;
+      img{
+        width:13px;
+        height:17px;
+        margin-left:5px;
+        margin-right:10px;
+      }
+    }
+    .swiper{
+      flex:1;
+      @include green;
+      line-height:1.2;
+      overflow:hidden;
+    }
   }
   .inform_card_data {
     display: flex;
@@ -176,7 +272,11 @@ export default {
     }
     .inform_card_list_precent {
       font-size: 14px;
-      color: #e56e52;
+      color: #00b48e;
+    }
+    .inform_card_list_precent2 {
+      font-size: 14px;
+      color: #00b48e;
     }
   }
 }

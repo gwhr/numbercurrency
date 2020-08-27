@@ -4,13 +4,19 @@
           {{$t('Purchase plug-in')}}
       </div>
       <div class="buypad">
-          <div class="buyPlugin">
+          <div class="buyPlugin" @click="show = true">
               {{$t('Purchase plug-in')}}
           </div>
-          <div class="applyPlugin">
+          <!-- <div class="applyPlugin">
               {{$t('Apply for experience plug-in')}}
-          </div>
+          </div> -->
       </div>
+      <van-dialog @confirm="confirm" class="dialog" :confirmButtonText="$t('confirm')" :cancelButtonText="$t('cancel')" v-model="show" :title="$t('Please enter the transaction password')" show-cancel-button>
+        <div style="padding:20px;">
+            <van-field class="password" v-model="password" :placeholder="$t('Please input a password')" type="password"/>
+        </div>
+        
+      </van-dialog>
   </div>
 </template>
 
@@ -18,11 +24,29 @@
 export default {
   data() {
     return {
-
+      show:false,
+      password:""
     };
   },
   methods: {
-
+    confirm(){
+      this.buyMachine()
+    },
+    /*
+        購買外掛
+     */
+    buyMachine(){
+      let params = {
+        pay_password:this.password
+      }
+        this.globalApi.api.index.buyMachine(params).then(value=>{
+              if(value.data.code == 200){
+                  console.log(value)
+              }else{
+                  this.$toast.fail(value.data.descrp)
+              }
+          })
+    },
   },
   created() {
 
@@ -63,5 +87,15 @@ export default {
         background: #0d9652;
       }
     }
+  }
+  .dialog{
+    color:#000;
+  }
+  .password{
+    border:1px solid #ccc;
+   /deep/ .van-field__control{
+      color:#000 !important;
+    }
+    
   }
 </style>

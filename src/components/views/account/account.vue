@@ -1,50 +1,50 @@
 <template>
   <div style="height:100%;overflow:auto;padding-bottom:50px">
       <div class="myhear">
-          <span class="setUp">
+          <span class="setUp" @click="tosetting">
               <img :src="setup" alt="">
           </span>
           <div class="myaccout">
                 <div class="logo">
-                    <img :src="logo" alt="">
+                    <img :src="userinfo.avatar" alt="">
                 </div>
-                <p class="account_level">
+                <!-- <p class="account_level">
                     代理帳號
-                </p>
+                </p> -->
                 <p class="account_name">
-                    暱稱:YZWETM
+                    暱稱:{{userinfo.user_nicename}}
                 </p>
           </div>
           <ul class="account_tab">
-              <li>
+              <li @click="toLink('/myassets')">
                   <div>
-                      <img :src="myzzc" alt="">
+                      <img :src="myzzc" alt="" >
                   </div>
                   <p class="account_tab_name">{{$t("total assets")}}</p>
               </li>
-              <li>
+              <li @click="toLink('/profitRecord')">
                   <div>
                       <img :src="myzl" alt="">
                   </div>
                   <p class="account_tab_name">{{$t("My profit")}}</p>
               </li>
-              <li>
-                  <div>
+              <li @click="toLink('/withdrawal')">
+                  <div >
                       <img :src="mylqzh" alt="">
                   </div>
-                  <p class="account_tab_name">{{$t("total assets")}}</p>
+                  <p class="account_tab_name">{{$t("Withdrawal account")}}</p>
               </li>
-              <li>
-                  <div>
+              <li @click="toLink('/promote')">
+                  <div >
                       <img :src="mytj" alt="">
                   </div>
-                  <p class="account_tab_name">{{$t("total assets")}}</p>
+                  <p class="account_tab_name">{{$t("Promote friends")}}</p>
               </li>
           </ul>
       </div>
       <div class="mylink_box">
           <ul class="mylink">
-            <li class="linl_item" v-for="(item,index) in menuList" :key="index">
+            <li class="linl_item" v-for="(item,index) in menuList" :key="index" @click="toLink(item.path)">
                 <div class="linl_item_name">
                     <img :src="item.img" alt="">
                     <span>{{item.name}}</span>
@@ -53,7 +53,24 @@
             </li>
         </ul>
       </div>
-      
+      <div>
+          <van-dialog 
+            v-model="show" 
+            :title="$t('tips')" 
+            :showConfirmButton = "false">
+            <div class="tips_content">
+                {{$t('Whether to exit the current login account')}}
+            </div>
+            <div class="dialog_control">
+                <span class="dialog_cancle" @click="close">
+                    取消
+                </span>
+                <span class="dialog_confirm" @click="confirm">
+                    {{$t('confirm')}}
+                </span>
+            </div>
+          </van-dialog>
+      </div>
   </div>
 </template>
 
@@ -83,46 +100,85 @@ export default {
         mytj,
         icontg,
         myyou,
+        userinfo:{},
+        show:false,
         menuList:[
             {
                 name:this.$t('My promotion'),
-                img:icontg
+                img:icontg,
+                path:'/promote'
             },
             {
                 name:this.$t('Real name authentication'),
-                img:iconrz
+                img:iconrz,
+                path:'/authentication'
             },
             {
                 name:this.$t('About us'),
-                img:iconwe
+                img:iconwe,
+                path:'/aboutAs'
             },
             {
                 name:this.$t('Privacy policy'),
-                img:iconys
+                img:iconys,
+                path:'/aboutAs'
             },
             {
                 name:this.$t('Official communication'),
-                img:icongf
+                img:icongf,
+                path:'/communication'
             },
-            {
-                name:this.$t('Version update'),
-                img:iconwm
-            },
+            // {
+            //     name:this.$t('Version update'),
+            //     img:iconwm,
+            //     path:'/version'
+            // },
             {
                 name:this.$t('Sign out'),
-                img:icontc
+                img:icontc,
+                path:''
             },
         ]
     };
   },
   methods: {
-
+    confirm(){
+        this.$router.push({
+            path:'/login'
+        })
+    },
+    toLink(path){
+        if(!path){
+            this.show = true;
+        }
+        this.$router.push({
+            path
+        })
+    },
+    close(){
+        this.show = false;
+    },
+    get_user_info(){
+        this.globalApi.api.user.get_user_info().then(value=>{
+              if(value.data.code == 200){
+                  console.log(value)
+                  this.userinfo = value.data.data;
+              }else{
+                  this.$toast.fail(value.data.descrp)
+              }
+          })
+    },
+    tosetting(){
+        this.$router.push({
+            path:'/setting'
+        })
+    }
   },
   created() {
 
   },
   mounted() {
-
+      this.get_user_info();
   },
   components: {},
 }
@@ -140,13 +196,15 @@ export default {
         right: 6%;
         top: 15%;
         z-index: 999;
+        width:22px;
+            height:22px;
         img{
             width:22px;
             height:22px;
         }
     }
     .myaccout{
-        width: 102px;
+        width: 150px;
         margin: 0 auto;
         padding-top: 61px;
         text-align: center;
@@ -155,6 +213,7 @@ export default {
             img{
                 width:76px;
                 height:76px;
+                border-radius:50%;
             }
         }
         .account_level{
@@ -215,4 +274,31 @@ export default {
         }
 }
 } 
+.van-dialog{
+    background:#1f1f23;
+}
+.tips_content{
+    text-align: center;
+    padding:15px;
+}
+.dialog_control{
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding:15px 50px;
+    span{
+        width: 130px;
+        height: 38px;
+        line-height: 38px;
+        text-align: center;
+        border-radius: 5px;
+        border:1px solid #3e434f;
+    }
+    .dialog_cancle{
+        margin-right:5px;
+    }
+    .dialog_confirm{
+        background:#0d9652;
+    }
+}
 </style>

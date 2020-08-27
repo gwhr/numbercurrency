@@ -16,7 +16,7 @@
 export default {
   data() {
     return {
-        name:this.$t('details'),
+        name:this.$t('About us'),
         content:'',
         title:'',
         time:''
@@ -29,7 +29,6 @@ export default {
 
   },
   mounted() {
-    console.log( this.$route.query.item)
       this.title = this.$route.query.item.post_title;
       this.content = this.$route.query.item.post_content;
       this.time = this.$route.query.item.post_date;
